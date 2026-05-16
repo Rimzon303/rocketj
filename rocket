@@ -1,0 +1,93 @@
+import asyncio
+import random
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.filters import Command
+from aiogram.enums import ParseMode
+
+# Вставь сюда свой токен, полученный от @BotFather
+API_TOKEN = 'ВАШ_ТОКЕН_ЗДЕСЬ'
+
+bot = Bot(token=API_TOKEN)
+dp = Dispatcher()
+
+# Главное меню
+main_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📦 Открыть кейс All in (0.5 TON)")],
+        [KeyboardButton(text="🎁 Другие кейсы")],
+        [KeyboardButton(text="⚡ Дать сигнал")]
+    ],
+    resize_keyboard=True
+)
+
+@dp.message(Command("start"))
+async def start_command(message: types.Message):
+    await message.answer(
+        "👋 Привет! Добро пожаловать в Топ гифт сигнал.\n"
+        "Здесь ты можешь испытывать удачу в кейсах или получать сигналы для игр!",
+        reply_markup=main_menu,
+        parse_mode=ParseMode.HTML
+    )
+
+# Логика сигналов
+@dp.message(F.text == "⚡ Дать сигнал")
+async def give_signal(message: types.Message):
+    # Генерация случайного числа от 0 до 10000 с округлением до 2 знаков (имитация X)
+    random_x = round(random.uniform(0.0, 10000.0), 2)
+    
+    await message.answer(
+        f"📊 <b>Прогноз на следующий раунд:</b>\n"
+        f"📈 Коэффициент: <code>{random_x}x</code>",
+        parse_mode=ParseMode.HTML
+    )
+
+# Логика кейса All in
+@dp.message(F.text == "📦 Открыть кейс All in (0.5 TON)")
+async def open_case_allin(message: types.Message):
+    await message.answer("🔄 Открываем кейс All in за 0.5 TON...")
+    await asyncio.sleep(1.5) # Эффект ожидания
+    
+    win_amount = round(random.uniform(0, 2), 2) # Пример выигрыша
+    await message.answer(f"🎉 Результат: {win_amount} TON!")
+
+# Другие кейсы (Меню)
+@dp.message(F.text == "🎁 Другие кейсы")
+async def other_cases(message: types.Message):
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Кейс 'Новичок' (0.1 TON)")],
+            [KeyboardButton(text="Кейс 'Мажор' (5.0 TON)")],
+            [KeyboardButton(text="🔙 Назад")]
+        ],
+        resize_keyboard=True
+    )
+    await message.answer("Выберите дополнительный кейс:", reply_markup=kb)
+
+# Логика для кейса Новичок
+@dp.message(F.text == "Кейс 'Новичок' (0.1 TON)")
+async def open_case_novice(message: types.Message):
+    await message.answer("🔄 Открываем кейс Новичок за 0.1 TON...")
+    await asyncio.sleep(1.2)
+    win_amount = round(random.uniform(0, 0.4), 2)
+    await message.answer(f"🎉 Результат: {win_amount} TON!")
+
+# Логика для кейса Мажор
+@dp.message(F.text == "Кейс 'Мажор' (5.0 TON)")
+async def open_case_major(message: types.Message):
+    await message.answer("🔄 Открываем кейс Мажор за 5.0 TON...")
+    await asyncio.sleep(2.0)
+    win_amount = round(random.uniform(0, 15), 2)
+    await message.answer(f"🎉 Результат: {win_amount} TON!")
+
+# Кнопка Назад
+@dp.message(F.text == "🔙 Назад")
+async def back_to_main(message: types.Message):
+    await message.answer("Главное меню:", reply_markup=main_menu)
+
+async def main():
+    print("Бот запущен!")
+    await dp.start_polling(bot)
+
+if name == "__main__":
+    asyncio.run(main())
